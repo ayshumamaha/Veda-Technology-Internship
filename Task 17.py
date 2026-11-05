@@ -1,5 +1,5 @@
 """
-Task 19: Read and Process a Text File
+Task 17: Read and Process a Text File
 
 Reads a text file and reports its line, word, and character counts.
 Handles missing files gracefully and processes the file line by line.
