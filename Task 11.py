@@ -1,5 +1,5 @@
 # Palindrome Checker
-# VEDA Technology - Python Programming Track, Level 1, Task 12
+# VEDA Technology - Python Programming Track, Level 1, Task 11
 
 def is_palindrome(text):
     """Check whether text is a palindrome, ignoring case and non-alphanumeric characters."""
