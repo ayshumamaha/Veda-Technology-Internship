@@ -1,4 +1,4 @@
-# Task 9: Practice Python Lists With Student Records
+# Task 8: Practice Python Lists With Student Records
 
 student_names = []
 student_marks = []
