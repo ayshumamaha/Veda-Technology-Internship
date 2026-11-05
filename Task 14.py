@@ -1,5 +1,5 @@
 # Shopping Bill Generator
-# VEDA Technology - Python Programming Track, Level 1, Task 15
+# VEDA Technology - Python Programming Track, Level 1, Task 14
 
 def calculate_bill(items, discount_percent, tax_percent):
     subtotal = sum(item["quantity"] * item["price"] for item in items)
