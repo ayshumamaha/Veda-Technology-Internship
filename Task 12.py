@@ -1,5 +1,5 @@
 # Prime Number Analyzer
-# VEDA Technology - Python Programming Track, Level 1, Task 13
+# VEDA Technology - Python Programming Track, Level 1, Task 12
 
 def is_prime(number):
     """Return True if number is prime, otherwise False."""
