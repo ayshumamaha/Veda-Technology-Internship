@@ -1,5 +1,5 @@
 # Word and Character Counter
-# VEDA Technology - Python Programming Track, Level 1, Task 11
+# VEDA Technology - Python Programming Track, Level 1, Task 10
 
 import re
 
