@@ -1,4 +1,4 @@
-"""Task 24: CLI Quiz Application.
+"""Task 19: CLI Quiz Application.
 Run with: python task24_cli_quiz.py
 A separate quiz_questions.json file is created automatically on first run.
 """
