@@ -1,6 +1,6 @@
 """
 Employee Salary Calculator
-Task 16 — Python Programming Track
+Task 15 — Python Programming Track
 
 Calculates gross salary, deductions, and net salary using configurable rules.
 Includes sample employee records and a salary calculation breakdown.
