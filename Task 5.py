@@ -1,5 +1,5 @@
 # Multiplication Table Generator
-# Task 6 - Python Programming Track
+# Task 5 - Python Programming Track
 
 number = int(input("Enter the number: "))
 limit = int(input("Enter the limit: "))
