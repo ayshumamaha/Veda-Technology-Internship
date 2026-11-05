@@ -1,5 +1,5 @@
 """
-Task 27 — Build a Simple API Client
+Task 22 — Build a Simple API Client
 A small Python client that calls the JSONPlaceholder public REST API,
 retrieves JSON data, and displays selected fields in a readable format.
 
