@@ -1,4 +1,4 @@
-# Task 8 - Simple To-Do List
+# Task 7 - Simple To-Do List
 
 tasks = []
 
