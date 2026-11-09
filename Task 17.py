@@ -7,9 +7,7 @@ Handles missing files gracefully and processes the file line by line.
 
 from pathlib import Path
 
-
 def process_text_file(filename):
-    """Return line, word, and character counts for a text file."""
     line_count = 0
     word_count = 0
     character_count = 0
@@ -21,19 +19,27 @@ def process_text_file(filename):
                 word_count += len(line.split())
                 character_count += len(line)
 
-        print(f"File: {filename}")
-        print(f"Lines: {line_count}")
-        print(f"Words: {word_count}")
-        print(f"Characters: {character_count}")
+        print("\n--- File Details ---")
+        print("File:", filename)
+        print("Lines:", line_count)
+        print("Words:", word_count)
+        print("Characters:", character_count)
 
-    except FileNotFoundError:
-        print(f"Error: The file '{filename}' was not found.")
     except OSError as error:
-        print(f"Error reading file: {error}")
+        print("Error:", error)
 
 
 def main():
-    filename = input("Enter the path to a text file: ").strip()
+    filename = "sample.txt"
+
+    # Automatically create a sample text file
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write("Python is easy to learn.\n")
+        file.write("I am learning file handling.\n")
+        file.write("This is Task 17 of my internship.")
+
+    print("Sample text file created successfully!")
+
     process_text_file(filename)
 
 
