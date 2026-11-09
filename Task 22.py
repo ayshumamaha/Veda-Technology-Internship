@@ -10,65 +10,49 @@ Run:
     python api_client.py
 """
 
+"""
+Task 22: Build a Simple API Client
+Fetches an English quote from a public API
+and displays it in a readable format.
+"""
+
 import requests
 
-API_URL = "https://jsonplaceholder.typicode.com/posts/1"
-TIMEOUT_SECONDS = 10
+API_URL = "https://dummyjson.com/quotes/1"
 
-
-def fetch_post(url: str = API_URL) -> dict | None:
-    """Fetch one post from the public API and return its JSON data."""
+def fetch_quote():
     try:
-        response = requests.get(url, timeout=TIMEOUT_SECONDS)
-
-        # Raise an exception for HTTP errors (4xx or 5xx).
+        response = requests.get(API_URL, timeout=10)
         response.raise_for_status()
+        return response.json()
 
-        data = response.json()
-        if not isinstance(data, dict):
-            print("Error: The API returned an unexpected JSON format.")
-            return None
-
-        return data
-
-    except requests.exceptions.Timeout:
-        print("Error: The request timed out. Please try again.")
-    except requests.exceptions.ConnectionError:
-        print("Error: Could not connect to the API. Check your internet connection.")
-    except requests.exceptions.HTTPError as error:
-        status = error.response.status_code if error.response is not None else "unknown"
-        print(f"Error: The API returned HTTP status {status}.")
     except requests.exceptions.RequestException as error:
-        print(f"Request error: {error}")
-    except ValueError:
-        print("Error: The response was not valid JSON.")
-
-    return None
+        print("Error connecting to API:", error)
+        return None
 
 
-def display_post(post: dict) -> None:
-    """Print selected post information in a clean format."""
+def display_quote(data):
     print("\n" + "=" * 45)
-    print("           API RESPONSE — POST DETAILS")
-    print("=" * 45)
-    print(f"Post ID : {post.get('id', 'Not available')}")
-    print(f"User ID : {post.get('userId', 'Not available')}")
-    print(f"Title   : {post.get('title', 'Not available')}")
-    print("-" * 45)
-    print("Body:")
-    print(post.get("body", "Not available"))
+    print("          ENGLISH QUOTE DETAILS")
     print("=" * 45)
 
+    print("Quote ID :", data.get("id"))
+    print("Quote    :", data.get("quote"))
+    print("Author   :", data.get("author"))
 
-def main() -> None:
-    print("Connecting to JSONPlaceholder API...")
-    post = fetch_post()
+    print("=" * 45)
 
-    if post is not None:
-        print("Request successful (HTTP 200).")
-        display_post(post)
+
+def main():
+    print("Connecting to English Quote API...")
+
+    data = fetch_quote()
+
+    if data:
+        print("Request successful!")
+        display_quote(data)
     else:
-        print("Unable to retrieve post data.")
+        print("Unable to retrieve quote.")
 
 
 if __name__ == "__main__":
