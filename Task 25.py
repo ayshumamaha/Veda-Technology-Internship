@@ -4,150 +4,83 @@ Expected input: Common/Combined Log Format, for example:
 127.0.0.1 - - [10/Oct/2026:13:55:36 +0000] "GET /index.html HTTP/1.1" 200 1024
 """
 
-import argparse
-import re
+"""
+Task: Web Server Log Analyzer
+Reads a sample log file and generates an analysis report.
+"""
+
 from collections import Counter
 from pathlib import Path
+import re
 
-LOG_PATTERN = re.compile(
-    r'^(?P<ip>\\S+)\\s+\\S+\\s+\\S+\\s+\\[[^\\]]+\\]\\s+'
-    r'"(?P<request>[^"]*)"\\s+(?P<status>\\d{3})\\s+\\S+'
-)
+# Create sample log file automatically
+log_data = """\
+127.0.0.1 - - [09/Nov/2026:10:00:00 +0000] "GET /home HTTP/1.1" 200 1024
+192.168.1.1 - - [09/Nov/2026:10:01:00 +0000] "GET /about HTTP/1.1" 200 2048
+127.0.0.1 - - [09/Nov/2026:10:02:00 +0000] "GET /login HTTP/1.1" 404 512
+192.168.1.2 - - [09/Nov/2026:10:03:00 +0000] "POST /login HTTP/1.1" 200 1024
+127.0.0.2 - - [09/Nov/2026:10:04:00 +0000] "GET /contact HTTP/1.1" 500 256
+"""
 
+Path("server.log").write_text(log_data)
 
-def parse_log_line(line):
-    """Extract the IP address, endpoint, and status code from one log line."""
-    match = LOG_PATTERN.match(line.strip())
-    if not match:
-        return None
-
-    request_parts = match.group("request").split()
-    endpoint = request_parts[1] if len(request_parts) >= 2 else "UNKNOWN"
-
-    return {
-        "ip": match.group("ip"),
-        "endpoint": endpoint,
-        "status": int(match.group("status")),
-    }
-
-
-def analyze_log_file(file_path):
-    """Read the log and calculate request, error, IP, endpoint, and status counts."""
-    total_requests = 0
-    error_count = 0
-    malformed_lines = 0
+def analyze_log():
     ip_counts = Counter()
     endpoint_counts = Counter()
     status_counts = Counter()
 
-    with Path(file_path).open("r", encoding="utf-8", errors="replace") as log_file:
-        for line in log_file:
-            if not line.strip():
-                continue
+    total = 0
+    errors = 0
 
-            record = parse_log_line(line)
-            if record is None:
-                malformed_lines += 1
-                continue
+    with open("server.log", "r") as file:
+        for line in file:
+            match = re.search(
+                r'^(\S+).*?"\S+ (\S+) HTTP/[\d.]+" (\d{3})',
+                line
+            )
 
-            total_requests += 1
-            ip_counts[record["ip"]] += 1
-            endpoint_counts[record["endpoint"]] += 1
-            status_counts[record["status"]] += 1
+            if match:
+                ip, endpoint, status = match.groups()
 
-            if record["status"] >= 400:
-                error_count += 1
+                ip_counts[ip] += 1
+                endpoint_counts[endpoint] += 1
+                status_counts[status] += 1
 
-    return {
-        "total_requests": total_requests,
-        "error_count": error_count,
-        "malformed_lines": malformed_lines,
-        "ip_counts": ip_counts,
-        "endpoint_counts": endpoint_counts,
-        "status_counts": status_counts,
-    }
+                total += 1
 
+                if int(status) >= 400:
+                    errors += 1
 
-def create_report(results, top_n=5):
-    """Format the analysis results as a readable text report."""
-    lines = [
-        "LOG FILE ANALYSIS REPORT",
-        "=" * 30,
-        f"Total requests: {results['total_requests']}",
-        f"Error responses (4xx and 5xx): {results['error_count']}",
-        f"Malformed lines skipped: {results['malformed_lines']}",
-        "",
-        f"Top {top_n} IP addresses:",
-    ]
+    print("\n===== WEB SERVER LOG REPORT =====")
+    print("Total Requests:", total)
+    print("Error Requests:", errors)
 
-    if results["ip_counts"]:
-        lines.extend(
-            f"{ip}: {count}"
-            for ip, count in results["ip_counts"].most_common(top_n)
-        )
-    else:
-        lines.append("No valid IP records found.")
+    print("\nIP Address Counts:")
+    for ip, count in ip_counts.items():
+        print(ip, ":", count)
 
-    lines.extend(["", f"Top {top_n} requested endpoints:"])
-    if results["endpoint_counts"]:
-        lines.extend(
-            f"{endpoint}: {count}"
-            for endpoint, count in results["endpoint_counts"].most_common(top_n)
-        )
-    else:
-        lines.append("No valid endpoint records found.")
+    print("\nEndpoint Counts:")
+    for endpoint, count in endpoint_counts.items():
+        print(endpoint, ":", count)
 
-    lines.extend(["", "HTTP status-code counts:"])
-    if results["status_counts"]:
-        lines.extend(
-            f"{status}: {count}"
-            for status, count in sorted(results["status_counts"].items())
-        )
-    else:
-        lines.append("No valid status codes found.")
+    print("\nHTTP Status Codes:")
+    for status, count in status_counts.items():
+        print(status, ":", count)
 
-    return "\\n".join(lines)
+    print("\n===== ANALYSIS COMPLETED =====")
 
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Analyze a server access log and summarize request activity."
+    report = (
+        f"Total Requests: {total}\n"
+        f"Error Requests: {errors}\n"
+        f"IP Addresses: {dict(ip_counts)}\n"
+        f"Endpoints: {dict(endpoint_counts)}\n"
+        f"Status Codes: {dict(status_counts)}"
     )
-    parser.add_argument(
-        "log_file",
-        nargs="?",
-        default="server.log",
-        help="Input log file (default: server.log)",
-    )
-    parser.add_argument(
-        "--top",
-        type=int,
-        default=5,
-        help="Number of top IP addresses and endpoints to display (default: 5)",
-    )
-    parser.add_argument(
-        "--output",
-        default="analysis_report.txt",
-        help="Output report filename (default: analysis_report.txt)",
-    )
-    args = parser.parse_args()
 
-    if args.top < 1:
-        parser.error("--top must be at least 1")
+    Path("analysis_report.txt").write_text(report)
 
-    log_path = Path(args.log_file)
-    if not log_path.is_file():
-        parser.error(f"Log file not found: {log_path}")
-
-    try:
-        results = analyze_log_file(log_path)
-        report = create_report(results, args.top)
-        print(report)
-        Path(args.output).write_text(report + "\\n", encoding="utf-8")
-        print(f"\\nReport saved to: {args.output}")
-    except OSError as error:
-        parser.error(f"Could not read or write a file: {error}")
+    print("\nReport saved as analysis_report.txt")
 
 
-if __name__ == "__main__":
-    main()
+analyze_log()
+
